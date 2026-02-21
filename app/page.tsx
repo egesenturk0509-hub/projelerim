@@ -498,6 +498,100 @@ void renkYaz(int r, int g, int b) {
 }
 `
   },
+{
+    id: 'uzaktanKumandaAraba',
+    title: 'Uzaktan Kumandalı Araba',
+    icon: '🚙',
+    description: 'IR kumanda ve L298N motor sürücü kullanarak hazırlanan, engelden kaçan akıllı araç projesi.',
+    materials: [
+      'Arduino Uno',
+      'L298N Motor Sürücü',
+      '4 Adet Sarı DC Motor ve Tekerlek',
+      'HC-SR04 Ultrasonik Mesafe Sensörü',
+      'IR Alıcı Göz ve Kumanda',
+      'Breadboard ve Jumper Kablolar',
+      'Güç Kaynağı'
+    ],
+    connections: `
+    Motor 1 & 2 (Sol taraf): L298N Motor Sürücü OUT1 ve OUT2 çıkışlarına paralel bağlanır.
+Motor 3 & 4 (Sağ taraf): L298N Motor Sürücü OUT3 ve OUT4 çıkışlarına paralel bağlanır.
+L298N Motor Sürücü IN1: Arduino UNO Pin 3 (PWM)
+L298N Motor Sürücü IN2: Arduino UNO Pin 5 (PWM)
+L298N Motor Sürücü IN3: Arduino UNO Pin 6 (PWM)
+L298N Motor Sürücü IN4: Arduino UNO Pin 9 (PWM)
+L298N Motor Sürücü GND: Arduino UNO GND pinine bağlanmalı
+L298N Motor Sürücü VCC: Arduino UNO 5V
+HC-SR04 Mesafe Sensörü Trig: Arduino UNO Pin 2
+HC-SR04 Mesafe Sensörü Echo: Arduino UNO Pin 4
+HC-SR04 Mesafe Sensörü GND: Arduino UNO GND
+HC-SR04 Mesafe Sensörü VCC: Arduino UNO 5V
+IR Kumanda Alıcısı VCC: Arduino UNO 5V
+IR Kumanda Alıcısı GND: Arduino UNO GND
+IR Kumanda Alıcısı Signal : Arduino UNO Pin 11`,
+    code: `#include <IRremote.h>
+const int IN1 = 3;
+const int IN2 = 5;
+const int IN3 = 6;
+const int IN4 = 9;
+const int trigPin = 2;
+const int echoPin = 4;
+const int RECV_PIN = 11;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+void setup() {
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  irrecv.enableIRIn();
+}
+void loop() {
+  long sure, mesafe;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  sure = pulseIn(echoPin, HIGH);
+  mesafe = (sure / 2) / 29.1;
+  if (mesafe < 5 && mesafe > 0) {
+    dur();
+  }
+  if (irrecv.decode(&results)) {
+    unsigned long value = results.value;
+    switch(value) {
+      case 0xFF18E7: ileri(); break;
+      case 0xFF4AB5: geri(); break;
+      case 0xFF10EF: sol(); break;
+      case 0xFF5AA5: sag(); break;
+      case 0xFF38C7: dur(); break;
+    }
+    irrecv.resume();
+  }
+}
+void ileri() {
+  analogWrite(IN1, 255); digitalWrite(IN2, LOW);
+  analogWrite(IN3, 255); digitalWrite(IN4, LOW);
+}
+void geri() {
+  digitalWrite(IN1, LOW); analogWrite(IN2, 255);
+  digitalWrite(IN3, LOW); analogWrite(IN4, 255);
+}
+void sag() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  analogWrite(IN3, 255); digitalWrite(IN4, LOW);
+}
+void sol() {
+  analogWrite(IN1, 255); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+void dur() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}`
+  },
   {
     id: 'gazAlarmi',
     title: 'Gaz Alarm Sistemi',

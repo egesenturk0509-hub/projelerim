@@ -541,6 +541,100 @@ void renkYaz(int r, int g, int b) {
 `
     },
     {
+        id: 'uzaktanKumandaAraba',
+        title: 'Uzaktan Kumandalı Araba',
+        icon: '🚙',
+        description: 'IR kumanda ve L298N motor sürücü kullanarak hazırlanan, engelden kaçan akıllı araç projesi.',
+        materials: [
+            'Arduino Uno',
+            'L298N Motor Sürücü',
+            '4 Adet Sarı DC Motor ve Tekerlek',
+            'HC-SR04 Ultrasonik Mesafe Sensörü',
+            'IR Alıcı Göz ve Kumanda',
+            'Breadboard ve Jumper Kablolar',
+            'Güç Kaynağı'
+        ],
+        connections: `
+    Motor 1 & 2 (Sol taraf): L298N Motor Sürücü OUT1 ve OUT2 çıkışlarına paralel bağlanır.
+Motor 3 & 4 (Sağ taraf): L298N Motor Sürücü OUT3 ve OUT4 çıkışlarına paralel bağlanır.
+L298N Motor Sürücü IN1: Arduino UNO Pin 3 (PWM)
+L298N Motor Sürücü IN2: Arduino UNO Pin 5 (PWM)
+L298N Motor Sürücü IN3: Arduino UNO Pin 6 (PWM)
+L298N Motor Sürücü IN4: Arduino UNO Pin 9 (PWM)
+L298N Motor Sürücü GND: Arduino UNO GND pinine bağlanmalı
+L298N Motor Sürücü VCC: Arduino UNO 5V
+HC-SR04 Mesafe Sensörü Trig: Arduino UNO Pin 2
+HC-SR04 Mesafe Sensörü Echo: Arduino UNO Pin 4
+HC-SR04 Mesafe Sensörü GND: Arduino UNO GND
+HC-SR04 Mesafe Sensörü VCC: Arduino UNO 5V
+IR Kumanda Alıcısı VCC: Arduino UNO 5V
+IR Kumanda Alıcısı GND: Arduino UNO GND
+IR Kumanda Alıcısı Signal : Arduino UNO Pin 11`,
+        code: `#include <IRremote.h>
+const int IN1 = 3;
+const int IN2 = 5;
+const int IN3 = 6;
+const int IN4 = 9;
+const int trigPin = 2;
+const int echoPin = 4;
+const int RECV_PIN = 11;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+void setup() {
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  irrecv.enableIRIn();
+}
+void loop() {
+  long sure, mesafe;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  sure = pulseIn(echoPin, HIGH);
+  mesafe = (sure / 2) / 29.1;
+  if (mesafe < 5 && mesafe > 0) {
+    dur();
+  }
+  if (irrecv.decode(&results)) {
+    unsigned long value = results.value;
+    switch(value) {
+      case 0xFF18E7: ileri(); break;
+      case 0xFF4AB5: geri(); break;
+      case 0xFF10EF: sol(); break;
+      case 0xFF5AA5: sag(); break;
+      case 0xFF38C7: dur(); break;
+    }
+    irrecv.resume();
+  }
+}
+void ileri() {
+  analogWrite(IN1, 255); digitalWrite(IN2, LOW);
+  analogWrite(IN3, 255); digitalWrite(IN4, LOW);
+}
+void geri() {
+  digitalWrite(IN1, LOW); analogWrite(IN2, 255);
+  digitalWrite(IN3, LOW); analogWrite(IN4, 255);
+}
+void sag() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  analogWrite(IN3, 255); digitalWrite(IN4, LOW);
+}
+void sol() {
+  analogWrite(IN1, 255); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+void dur() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}`
+    },
+    {
         id: 'gazAlarmi',
         title: 'Gaz Alarm Sistemi',
         icon: '🚨',
@@ -659,7 +753,7 @@ function RobotikProje() {
                 children: styles
             }, void 0, false, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 609,
+                lineNumber: 703,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
@@ -669,7 +763,7 @@ function RobotikProje() {
                         children: "Robotik Mühendisliği Projeleri"
                     }, void 0, false, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 611,
+                        lineNumber: 705,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -677,13 +771,13 @@ function RobotikProje() {
                         children: "Ege Şentürk | Geleceğin Teknolojileri"
                     }, void 0, false, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 612,
+                        lineNumber: 706,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 610,
+                lineNumber: 704,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -703,25 +797,25 @@ function RobotikProje() {
                                         children: proj.icon
                                     }, void 0, false, {
                                         fileName: "[project]/app/page.tsx",
-                                        lineNumber: 620,
+                                        lineNumber: 714,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                         children: proj.title
                                     }, void 0, false, {
                                         fileName: "[project]/app/page.tsx",
-                                        lineNumber: 621,
+                                        lineNumber: 715,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, proj.id, true, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 619,
+                                lineNumber: 713,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 617,
+                        lineNumber: 711,
                         columnNumber: 11
                     }, this),
                     view === 'detail' && selectedProject && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -733,7 +827,7 @@ function RobotikProje() {
                                 children: "⬅ Geri Dön"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 629,
+                                lineNumber: 723,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -744,21 +838,21 @@ function RobotikProje() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 630,
+                                lineNumber: 724,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 children: selectedProject.description
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 631,
+                                lineNumber: 725,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                 children: "📦 Gerekli Malzemeler"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 632,
+                                lineNumber: 726,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -766,19 +860,19 @@ function RobotikProje() {
                                         children: m
                                     }, i, false, {
                                         fileName: "[project]/app/page.tsx",
-                                        lineNumber: 633,
+                                        lineNumber: 727,
                                         columnNumber: 74
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 633,
+                                lineNumber: 727,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                 children: "🔌 Bağlantı Şeması"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 634,
+                                lineNumber: 728,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -790,7 +884,7 @@ function RobotikProje() {
                                 children: selectedProject.connections
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 635,
+                                lineNumber: 729,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -802,13 +896,13 @@ function RobotikProje() {
                                         children: "İndir"
                                     }, void 0, false, {
                                         fileName: "[project]/app/page.tsx",
-                                        lineNumber: 636,
+                                        lineNumber: 730,
                                         columnNumber: 33
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 636,
+                                lineNumber: 730,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -816,25 +910,25 @@ function RobotikProje() {
                                 children: selectedProject.code
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 637,
+                                lineNumber: 731,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 628,
+                        lineNumber: 722,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 615,
+                lineNumber: 709,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.tsx",
-        lineNumber: 608,
+        lineNumber: 702,
         columnNumber: 5
     }, this);
 }
